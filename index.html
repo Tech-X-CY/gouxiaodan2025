@@ -27,7 +27,7 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             padding: 40px;
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             text-align: center;
             backdrop-filter: blur(10px);
         }
@@ -48,6 +48,142 @@
             color: #666;
             margin-bottom: 30px;
             font-size: 16px;
+        }
+
+        .sync-status {
+            background: #e8f5e8;
+            border: 1px solid #4caf50;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .sync-status.syncing {
+            background: #e3f2fd;
+            border-color: #2196f3;
+        }
+
+        .sync-status.offline {
+            background: #fff3cd;
+            border-color: #ffc107;
+        }
+
+        .sync-status.error {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+
+        .sync-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4caf50;
+        }
+
+        .sync-indicator.syncing {
+            background: #2196f3;
+            animation: pulse 1.5s infinite;
+        }
+
+        .sync-indicator.offline {
+            background: #ffc107;
+        }
+
+        .sync-indicator.error {
+            background: #dc3545;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .sync-code-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .sync-code-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .sync-code-display {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 3px;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .sync-code-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            text-align: center;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            outline: none;
+            margin-bottom: 10px;
+        }
+
+        .sync-code-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .sync-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 15px;
+        }
+
+        .sync-tab {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .sync-tab.active {
+            background: white;
+            color: #667eea;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .sync-content {
+            display: none;
+        }
+
+        .sync-content.active {
+            display: block;
         }
 
         .form-group {
@@ -87,6 +223,16 @@
             cursor: pointer;
             transition: all 0.3s ease;
             margin-bottom: 15px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         .btn-primary {
@@ -100,9 +246,28 @@
             border: 2px solid #e9ecef;
         }
 
-        .btn:hover {
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .btn:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .loading-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .divider {
@@ -127,75 +292,6 @@
             color: #666;
         }
 
-        .device-info {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            color: #666;
-        }
-
-        .device-info strong {
-            color: #333;
-        }
-
-        .sync-options {
-            background: #e3f2fd;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .sync-title {
-            font-weight: bold;
-            color: #1976d2;
-            margin-bottom: 10px;
-        }
-
-        .sync-option {
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .sync-option input[type="radio"] {
-            margin: 0;
-        }
-
-        .sync-option label {
-            margin: 0;
-            cursor: pointer;
-            flex: 1;
-        }
-
-        .export-import {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .btn-small {
-            padding: 8px 15px;
-            font-size: 14px;
-            flex: 1;
-        }
-
-        .data-code {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 5px;
-            padding: 10px;
-            font-family: monospace;
-            font-size: 12px;
-            word-break: break-all;
-            max-height: 100px;
-            overflow-y: auto;
-            margin-top: 10px;
-        }
-
         .toast {
             position: fixed;
             top: 20px;
@@ -207,6 +303,7 @@
             z-index: 10000;
             opacity: 0;
             transition: all 0.3s ease;
+            max-width: 300px;
         }
 
         .toast.success {
@@ -225,6 +322,38 @@
             opacity: 1;
         }
 
+        .help-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+
+        .feature-highlight {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .feature-highlight h4 {
+            color: #1976d2;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .feature-highlight ul {
+            margin: 0;
+            padding-left: 20px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .feature-highlight li {
+            margin-bottom: 4px;
+        }
+
         @media (max-width: 480px) {
             .login-container {
                 padding: 30px 20px;
@@ -235,8 +364,9 @@
                 font-size: 24px;
             }
 
-            .export-import {
-                flex-direction: column;
+            .sync-code-display {
+                font-size: 20px;
+                letter-spacing: 2px;
             }
         }
     </style>
@@ -247,30 +377,49 @@
         <h1 class="title">购销单管理系统</h1>
         <p class="subtitle">厦门汇仕环保科技有限公司</p>
 
-        <div class="device-info">
-            <strong>当前设备信息：</strong><br>
-            <span id="deviceInfo">检测中...</span>
+        <div class="sync-status" id="syncStatus">
+            <div class="sync-indicator" id="syncIndicator"></div>
+            <span id="syncStatusText">云端同步已就绪</span>
         </div>
 
-        <div class="sync-options">
-            <div class="sync-title">🔄 跨设备数据同步</div>
-            <div class="sync-option">
-                <input type="radio" id="localMode" name="syncMode" value="local" checked>
-                <label for="localMode">本地模式（仅当前设备）</label>
+        <div class="feature-highlight">
+            <h4>🌟 全新云端同步功能</h4>
+            <ul>
+                <li>✅ 数据自动云端备份</li>
+                <li>✅ 多设备实时同步</li>
+                <li>✅ 手机电脑无缝切换</li>
+                <li>✅ 永不丢失订单数据</li>
+            </ul>
+        </div>
+
+        <div class="sync-code-section">
+            <div class="sync-tabs">
+                <button class="sync-tab active" onclick="switchSyncTab('new')">新用户注册</button>
+                <button class="sync-tab" onclick="switchSyncTab('existing')">已有同步码</button>
             </div>
-            <div class="sync-option">
-                <input type="radio" id="exportMode" name="syncMode" value="export">
-                <label for="exportMode">导出/导入模式（跨设备同步）</label>
+
+            <div class="sync-content active" id="newUserContent">
+                <div class="sync-code-title">🎉 您的专属同步码</div>
+                <div class="sync-code-display" id="generatedSyncCode">点击生成</div>
+                <button class="btn btn-success" onclick="generateSyncCode()">
+                    <span id="generateBtnText">🔄 生成我的同步码</span>
+                    <div class="loading-spinner" id="generateSpinner" style="display: none;"></div>
+                </button>
+                <div class="help-text">
+                    💡 同步码是您在所有设备上登录的唯一凭证，请妥善保存！生成后可在任意设备输入此码来同步数据。
+                </div>
             </div>
-            
-            <div class="export-import" id="exportImportSection" style="display: none;">
-                <button class="btn btn-secondary btn-small" onclick="exportUserData()">📤 导出数据</button>
-                <button class="btn btn-secondary btn-small" onclick="importUserData()">📥 导入数据</button>
-            </div>
-            
-            <div id="dataCodeSection" style="display: none;">
-                <textarea class="data-code" id="dataCodeInput" placeholder="请粘贴从其他设备导出的数据代码..."></textarea>
-                <button class="btn btn-primary btn-small" onclick="processImportData()" style="margin-top: 10px; width: 100%;">确认导入</button>
+
+            <div class="sync-content" id="existingUserContent">
+                <div class="sync-code-title">🔑 输入您的同步码</div>
+                <input type="text" class="sync-code-input" id="syncCodeInput" placeholder="输入6位同步码" maxlength="6">
+                <button class="btn btn-primary" onclick="connectToSync()">
+                    <span id="connectBtnText">🔗 连接云端数据</span>
+                    <div class="loading-spinner" id="connectSpinner" style="display: none;"></div>
+                </button>
+                <div class="help-text">
+                    💡 输入您之前生成的6位同步码，系统将自动同步您的所有数据。
+                </div>
             </div>
         </div>
 
@@ -285,7 +434,10 @@
                 <input type="password" id="password" class="form-input" placeholder="请输入密码" required>
             </div>
             
-            <button type="submit" class="btn btn-primary">🔐 登录</button>
+            <button type="submit" class="btn btn-primary">
+                <span id="loginBtnText">🔐 登录系统</span>
+                <div class="loading-spinner" id="loginSpinner" style="display: none;"></div>
+            </button>
         </form>
 
         <div class="divider">
@@ -311,13 +463,23 @@
                     <input type="password" id="confirmPassword" class="form-input" placeholder="请再次输入密码" required>
                 </div>
                 
-                <button type="submit" class="btn btn-primary">✅ 注册</button>
+                <button type="submit" class="btn btn-primary">
+                    <span id="registerBtnText">✅ 注册账户</span>
+                    <div class="loading-spinner" id="registerSpinner" style="display: none;"></div>
+                </button>
                 <button type="button" class="btn btn-secondary" onclick="hideRegister()">❌ 取消</button>
             </form>
         </div>
     </div>
 
     <script>
+        // 全局变量
+        let currentSyncCode = null;
+        let syncInterval = null;
+
+        // GitHub Gist API配置
+        const GIST_API_URL = 'https://api.github.com/gists';
+        
         // 显示消息提示
         function showToast(message, type = 'info') {
             const toast = document.createElement('div');
@@ -336,51 +498,315 @@
             }, 3000);
         }
 
-        // 获取设备信息
-        function getDeviceInfo() {
-            const userAgent = navigator.userAgent;
-            let deviceType = '未知设备';
-            let browser = '未知浏览器';
+        // 更新同步状态
+        function updateSyncStatus(status, text) {
+            const statusEl = document.getElementById('syncStatus');
+            const indicatorEl = document.getElementById('syncIndicator');
+            const textEl = document.getElementById('syncStatusText');
             
-            // 检测设备类型
-            if (/Mobile|Android|iPhone|iPad/.test(userAgent)) {
-                deviceType = '移动设备';
-            } else {
-                deviceType = 'PC设备';
+            // 清除所有状态类
+            statusEl.className = 'sync-status';
+            indicatorEl.className = 'sync-indicator';
+            
+            // 添加新状态
+            if (status !== 'online') {
+                statusEl.classList.add(status);
+                indicatorEl.classList.add(status);
             }
             
-            // 检测浏览器
-            if (userAgent.includes('Chrome')) {
-                browser = 'Chrome';
-            } else if (userAgent.includes('Firefox')) {
-                browser = 'Firefox';
-            } else if (userAgent.includes('Safari')) {
-                browser = 'Safari';
-            } else if (userAgent.includes('Edge')) {
-                browser = 'Edge';
-            }
-            
-            return `${deviceType} - ${browser}`;
+            textEl.textContent = text;
         }
 
-        // 生成设备唯一标识
-        function getDeviceId() {
-            let deviceId = localStorage.getItem('deviceId');
-            if (!deviceId) {
-                deviceId = 'device_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                localStorage.setItem('deviceId', deviceId);
+        // 生成6位随机同步码
+        function generateRandomCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < 6; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
             }
-            return deviceId;
+            return result;
         }
 
-        // 获取用户存储键名
-        function getUserStorageKey(username) {
-            const syncMode = document.querySelector('input[name="syncMode"]:checked').value;
-            if (syncMode === 'local') {
-                return `user_${username}_${getDeviceId()}`;
+        // 切换同步标签
+        function switchSyncTab(tab) {
+            // 更新标签状态
+            document.querySelectorAll('.sync-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.sync-content').forEach(c => c.classList.remove('active'));
+            
+            if (tab === 'new') {
+                document.querySelector('.sync-tab').classList.add('active');
+                document.getElementById('newUserContent').classList.add('active');
             } else {
-                return `user_${username}_global`;
+                document.querySelectorAll('.sync-tab')[1].classList.add('active');
+                document.getElementById('existingUserContent').classList.add('active');
             }
+        }
+
+        // 生成同步码
+        async function generateSyncCode() {
+            const generateBtn = document.getElementById('generateBtnText');
+            const generateSpinner = document.getElementById('generateSpinner');
+            const syncCodeDisplay = document.getElementById('generatedSyncCode');
+            
+            // 显示加载状态
+            generateBtn.style.display = 'none';
+            generateSpinner.style.display = 'block';
+            updateSyncStatus('syncing', '正在创建云端存储...');
+            
+            try {
+                // 生成同步码
+                const syncCode = generateRandomCode();
+                
+                // 创建初始数据结构
+                const initialData = {
+                    syncCode: syncCode,
+                    users: {},
+                    orderHistory: [],
+                    createdAt: new Date().toISOString(),
+                    lastSync: new Date().toISOString()
+                };
+                
+                // 创建GitHub Gist
+                const gistData = {
+                    description: `购销单系统数据 - ${syncCode}`,
+                    public: false,
+                    files: {
+                        [`data_${syncCode}.json`]: {
+                            content: JSON.stringify(initialData, null, 2)
+                        }
+                    }
+                };
+                
+                const response = await fetch(GIST_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(gistData)
+                });
+                
+                if (response.ok) {
+                    const gist = await response.json();
+                    
+                    // 保存同步信息
+                    currentSyncCode = syncCode;
+                    localStorage.setItem('syncCode', syncCode);
+                    localStorage.setItem('gistId', gist.id);
+                    localStorage.setItem('gistUrl', gist.url);
+                    
+                    // 显示同步码
+                    syncCodeDisplay.textContent = syncCode;
+                    updateSyncStatus('online', '云端同步已激活');
+                    showToast('同步码生成成功！请保存好您的同步码', 'success');
+                    
+                    // 启动自动同步
+                    startAutoSync();
+                } else {
+                    throw new Error('创建云端存储失败');
+                }
+            } catch (error) {
+                console.error('生成同步码失败:', error);
+                updateSyncStatus('error', '云端连接失败');
+                showToast('生成同步码失败，请检查网络连接', 'error');
+                syncCodeDisplay.textContent = '生成失败';
+            } finally {
+                // 恢复按钮状态
+                generateBtn.style.display = 'inline';
+                generateSpinner.style.display = 'none';
+            }
+        }
+
+        // 连接到现有同步码
+        async function connectToSync() {
+            const syncCodeInput = document.getElementById('syncCodeInput');
+            const connectBtn = document.getElementById('connectBtnText');
+            const connectSpinner = document.getElementById('connectSpinner');
+            const syncCode = syncCodeInput.value.trim().toUpperCase();
+            
+            if (!syncCode || syncCode.length !== 6) {
+                showToast('请输入6位同步码', 'error');
+                return;
+            }
+            
+            // 显示加载状态
+            connectBtn.style.display = 'none';
+            connectSpinner.style.display = 'block';
+            updateSyncStatus('syncing', '正在连接云端...');
+            
+            try {
+                // 搜索对应的Gist
+                const searchResponse = await fetch(`${GIST_API_URL}?per_page=100`);
+                if (!searchResponse.ok) {
+                    throw new Error('搜索云端数据失败');
+                }
+                
+                const gists = await searchResponse.json();
+                const targetGist = gists.find(gist => 
+                    gist.description && gist.description.includes(syncCode)
+                );
+                
+                if (!targetGist) {
+                    throw new Error('同步码不存在');
+                }
+                
+                // 获取Gist详细数据
+                const gistResponse = await fetch(targetGist.url);
+                if (!gistResponse.ok) {
+                    throw new Error('获取云端数据失败');
+                }
+                
+                const gistData = await gistResponse.json();
+                const fileName = Object.keys(gistData.files)[0];
+                const fileContent = gistData.files[fileName].content;
+                const cloudData = JSON.parse(fileContent);
+                
+                // 同步数据到本地
+                if (cloudData.users) {
+                    Object.keys(cloudData.users).forEach(key => {
+                        localStorage.setItem(key, JSON.stringify(cloudData.users[key]));
+                    });
+                }
+                
+                if (cloudData.orderHistory) {
+                    localStorage.setItem('orderHistory', JSON.stringify(cloudData.orderHistory));
+                }
+                
+                // 保存同步信息
+                currentSyncCode = syncCode;
+                localStorage.setItem('syncCode', syncCode);
+                localStorage.setItem('gistId', targetGist.id);
+                localStorage.setItem('gistUrl', targetGist.url);
+                
+                updateSyncStatus('online', '云端同步已连接');
+                showToast('数据同步成功！', 'success');
+                
+                // 启动自动同步
+                startAutoSync();
+                
+                // 清空输入框
+                syncCodeInput.value = '';
+                
+            } catch (error) {
+                console.error('连接同步失败:', error);
+                updateSyncStatus('error', '连接失败');
+                showToast(error.message || '连接同步码失败', 'error');
+            } finally {
+                // 恢复按钮状态
+                connectBtn.style.display = 'inline';
+                connectSpinner.style.display = 'none';
+            }
+        }
+
+        // 同步数据到云端
+        async function syncToCloud() {
+            const syncCode = localStorage.getItem('syncCode');
+            const gistId = localStorage.getItem('gistId');
+            
+            if (!syncCode || !gistId) {
+                return;
+            }
+            
+            try {
+                // 收集本地数据
+                const localData = {
+                    syncCode: syncCode,
+                    users: {},
+                    orderHistory: JSON.parse(localStorage.getItem('orderHistory') || '[]'),
+                    lastSync: new Date().toISOString()
+                };
+                
+                // 收集用户数据
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key.startsWith('user_')) {
+                        localData.users[key] = JSON.parse(localStorage.getItem(key));
+                    }
+                }
+                
+                // 更新Gist
+                const updateData = {
+                    files: {
+                        [`data_${syncCode}.json`]: {
+                            content: JSON.stringify(localData, null, 2)
+                        }
+                    }
+                };
+                
+                const response = await fetch(`${GIST_API_URL}/${gistId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(updateData)
+                });
+                
+                if (response.ok) {
+                    updateSyncStatus('online', '数据已同步到云端');
+                } else {
+                    throw new Error('同步失败');
+                }
+            } catch (error) {
+                console.error('同步到云端失败:', error);
+                updateSyncStatus('error', '同步失败');
+            }
+        }
+
+        // 从云端同步数据
+        async function syncFromCloud() {
+            const gistId = localStorage.getItem('gistId');
+            
+            if (!gistId) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${GIST_API_URL}/${gistId}`);
+                if (!response.ok) {
+                    throw new Error('获取云端数据失败');
+                }
+                
+                const gistData = await response.json();
+                const fileName = Object.keys(gistData.files)[0];
+                const fileContent = gistData.files[fileName].content;
+                const cloudData = JSON.parse(fileContent);
+                
+                // 检查是否有更新
+                const lastLocalSync = localStorage.getItem('lastSyncTime');
+                const cloudLastSync = cloudData.lastSync;
+                
+                if (!lastLocalSync || new Date(cloudLastSync) > new Date(lastLocalSync)) {
+                    // 同步用户数据
+                    if (cloudData.users) {
+                        Object.keys(cloudData.users).forEach(key => {
+                            localStorage.setItem(key, JSON.stringify(cloudData.users[key]));
+                        });
+                    }
+                    
+                    // 同步订单历史
+                    if (cloudData.orderHistory) {
+                        localStorage.setItem('orderHistory', JSON.stringify(cloudData.orderHistory));
+                    }
+                    
+                    localStorage.setItem('lastSyncTime', cloudLastSync);
+                    updateSyncStatus('online', '已从云端更新数据');
+                }
+            } catch (error) {
+                console.error('从云端同步失败:', error);
+                updateSyncStatus('error', '同步失败');
+            }
+        }
+
+        // 启动自动同步
+        function startAutoSync() {
+            if (syncInterval) {
+                clearInterval(syncInterval);
+            }
+            
+            // 每30秒同步一次
+            syncInterval = setInterval(async () => {
+                await syncFromCloud();
+                await syncToCloud();
+            }, 30000);
         }
 
         // 显示/隐藏注册表单
@@ -392,76 +818,12 @@
             document.getElementById('registerSection').style.display = 'none';
         }
 
-        // 导出用户数据
-        function exportUserData() {
-            try {
-                const allData = {};
-                
-                // 导出所有用户数据
-                for (let i = 0; i < localStorage.length; i++) {
-                    const key = localStorage.key(i);
-                    if (key.startsWith('user_') || key === 'orderHistory' || key === 'purchaseOrderData') {
-                        allData[key] = localStorage.getItem(key);
-                    }
-                }
-                
-                const dataCode = btoa(JSON.stringify(allData));
-                
-                // 创建下载链接
-                const blob = new Blob([dataCode], { type: 'text/plain' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `购销单系统数据_${new Date().toISOString().split('T')[0]}.txt`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                
-                showToast('数据导出成功！请保存好导出的文件', 'success');
-            } catch (error) {
-                console.error('导出失败:', error);
-                showToast('数据导出失败', 'error');
-            }
-        }
-
-        // 导入用户数据
-        function importUserData() {
-            document.getElementById('dataCodeSection').style.display = 'block';
-            showToast('请粘贴从其他设备导出的数据代码', 'info');
-        }
-
-        // 处理导入数据
-        function processImportData() {
-            const dataCode = document.getElementById('dataCodeInput').value.trim();
-            if (!dataCode) {
-                showToast('请输入数据代码', 'error');
-                return;
-            }
-            
-            try {
-                const allData = JSON.parse(atob(dataCode));
-                
-                // 确认导入
-                if (confirm('导入数据将覆盖当前设备的所有数据，确定要继续吗？')) {
-                    Object.keys(allData).forEach(key => {
-                        localStorage.setItem(key, allData[key]);
-                    });
-                    
-                    showToast('数据导入成功！', 'success');
-                    document.getElementById('dataCodeSection').style.display = 'none';
-                    document.getElementById('dataCodeInput').value = '';
-                }
-            } catch (error) {
-                console.error('导入失败:', error);
-                showToast('数据代码格式错误，导入失败', 'error');
-            }
-        }
-
         // 登录处理
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
+            const loginBtn = document.getElementById('loginBtnText');
+            const loginSpinner = document.getElementById('loginSpinner');
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
             
@@ -470,40 +832,61 @@
                 return;
             }
             
-            const userKey = getUserStorageKey(username);
-            const userData = localStorage.getItem(userKey);
+            // 显示加载状态
+            loginBtn.style.display = 'none';
+            loginSpinner.style.display = 'block';
             
-            if (!userData) {
-                showToast('用户不存在，请先注册', 'error');
-                return;
+            try {
+                // 先从云端同步最新数据
+                await syncFromCloud();
+                
+                const userKey = `user_${username}`;
+                const userData = localStorage.getItem(userKey);
+                
+                if (!userData) {
+                    showToast('用户不存在，请先注册', 'error');
+                    return;
+                }
+                
+                const user = JSON.parse(userData);
+                if (user.password !== password) {
+                    showToast('密码错误', 'error');
+                    return;
+                }
+                
+                // 登录成功
+                const currentUser = {
+                    username: username,
+                    loginTime: new Date().toLocaleString('zh-CN'),
+                    syncCode: currentSyncCode
+                };
+                
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                showToast('登录成功！正在跳转...', 'success');
+                
+                // 同步到云端
+                await syncToCloud();
+                
+                setTimeout(() => {
+                    window.location.href = 'order.html';
+                }, 1500);
+                
+            } catch (error) {
+                console.error('登录失败:', error);
+                showToast('登录失败，请重试', 'error');
+            } finally {
+                // 恢复按钮状态
+                loginBtn.style.display = 'inline';
+                loginSpinner.style.display = 'none';
             }
-            
-            const user = JSON.parse(userData);
-            if (user.password !== password) {
-                showToast('密码错误', 'error');
-                return;
-            }
-            
-            // 登录成功
-            const currentUser = {
-                username: username,
-                loginTime: new Date().toLocaleString('zh-CN'),
-                deviceInfo: getDeviceInfo(),
-                deviceId: getDeviceId()
-            };
-            
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            showToast('登录成功！正在跳转...', 'success');
-            
-            setTimeout(() => {
-                window.location.href = 'order.html';
-            }, 1500);
         });
 
         // 注册处理
-        document.getElementById('registerForm').addEventListener('submit', function(e) {
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
+            const registerBtn = document.getElementById('registerBtnText');
+            const registerSpinner = document.getElementById('registerSpinner');
             const username = document.getElementById('newUsername').value.trim();
             const password = document.getElementById('newPassword').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
@@ -523,49 +906,61 @@
                 return;
             }
             
-            const userKey = getUserStorageKey(username);
-            if (localStorage.getItem(userKey)) {
-                showToast('用户名已存在', 'error');
-                return;
-            }
+            // 显示加载状态
+            registerBtn.style.display = 'none';
+            registerSpinner.style.display = 'block';
             
-            // 注册成功
-            const userData = {
-                username: username,
-                password: password,
-                registerTime: new Date().toLocaleString('zh-CN'),
-                deviceInfo: getDeviceInfo(),
-                deviceId: getDeviceId()
-            };
-            
-            localStorage.setItem(userKey, JSON.stringify(userData));
-            showToast('注册成功！请登录', 'success');
-            
-            // 清空注册表单并隐藏
-            document.getElementById('registerForm').reset();
-            hideRegister();
-            
-            // 自动填入用户名
-            document.getElementById('username').value = username;
-        });
-
-        // 同步模式切换
-        document.querySelectorAll('input[name="syncMode"]').forEach(radio => {
-            radio.addEventListener('change', function() {
-                const exportImportSection = document.getElementById('exportImportSection');
-                if (this.value === 'export') {
-                    exportImportSection.style.display = 'flex';
-                } else {
-                    exportImportSection.style.display = 'none';
-                    document.getElementById('dataCodeSection').style.display = 'none';
+            try {
+                // 先从云端同步最新数据
+                await syncFromCloud();
+                
+                const userKey = `user_${username}`;
+                if (localStorage.getItem(userKey)) {
+                    showToast('用户名已存在', 'error');
+                    return;
                 }
-            });
+                
+                // 注册成功
+                const userData = {
+                    username: username,
+                    password: password,
+                    registerTime: new Date().toLocaleString('zh-CN'),
+                    syncCode: currentSyncCode
+                };
+                
+                localStorage.setItem(userKey, JSON.stringify(userData));
+                showToast('注册成功！请登录', 'success');
+                
+                // 同步到云端
+                await syncToCloud();
+                
+                // 清空注册表单并隐藏
+                document.getElementById('registerForm').reset();
+                hideRegister();
+                
+                // 自动填入用户名
+                document.getElementById('username').value = username;
+                
+            } catch (error) {
+                console.error('注册失败:', error);
+                showToast('注册失败，请重试', 'error');
+            } finally {
+                // 恢复按钮状态
+                registerBtn.style.display = 'inline';
+                registerSpinner.style.display = 'none';
+            }
         });
 
         // 页面加载时初始化
         document.addEventListener('DOMContentLoaded', function() {
-            // 显示设备信息
-            document.getElementById('deviceInfo').textContent = getDeviceInfo();
+            // 检查是否已有同步码
+            const existingSyncCode = localStorage.getItem('syncCode');
+            if (existingSyncCode) {
+                currentSyncCode = existingSyncCode;
+                document.getElementById('generatedSyncCode').textContent = existingSyncCode;
+                updateSyncStatus('online', '云端同步已连接');
+                startAutoSync();
+            }
             
             // 检查是否已登录
             const currentUser = localStorage.getItem('currentUser');
@@ -575,6 +970,13 @@
                 setTimeout(() => {
                     window.location.href = 'order.html';
                 }, 1500);
+            }
+        });
+
+        // 页面卸载时清理
+        window.addEventListener('beforeunload', function() {
+            if (syncInterval) {
+                clearInterval(syncInterval);
             }
         });
     </script>
