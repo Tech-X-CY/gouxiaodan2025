@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>定/销货单系统 - 登录</title>
+    <title>购销单管理系统 - 登录</title>
     <style>
         * {
             margin: 0;
@@ -12,112 +12,103 @@
         }
 
         body {
-            font-family: "Microsoft YaHei", "黑体", "SimHei", sans-serif;
+            font-family: "Microsoft YaHei", "黑体", sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #333;
+            padding: 20px;
         }
 
         .login-container {
             background: rgba(255, 255, 255, 0.95);
-            padding: 40px;
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
             width: 100%;
             max-width: 400px;
+            text-align: center;
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .logo {
-            text-align: center;
-            margin-bottom: 30px;
+            font-size: 48px;
+            margin-bottom: 10px;
         }
 
-        .logo h1 {
-            font-size: 32px;
-            font-weight: 900;
+        .title {
+            font-size: 28px;
+            font-weight: bold;
             color: #333;
             margin-bottom: 10px;
-            letter-spacing: 2px;
         }
 
-        .logo p {
+        .subtitle {
             color: #666;
+            margin-bottom: 30px;
             font-size: 16px;
         }
 
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
+            text-align: left;
         }
 
-        .form-group label {
+        .form-label {
             display: block;
             margin-bottom: 8px;
-            font-weight: bold;
             color: #333;
-            font-size: 14px;
+            font-weight: bold;
         }
 
-        .form-group input {
+        .form-input {
             width: 100%;
             padding: 15px;
-            border: 2px solid #e1e5e9;
+            border: 2px solid #e9ecef;
             border-radius: 10px;
             font-size: 16px;
             transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.8);
+            outline: none;
         }
 
-        .form-group input:focus {
-            outline: none;
+        .form-input:focus {
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-            background: white;
         }
 
         .btn {
             width: 100%;
             padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
             border: none;
             border-radius: 10px;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
             margin-bottom: 15px;
         }
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn:active {
-            transform: translateY(0);
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
         }
 
         .btn-secondary {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            background: #f8f9fa;
             color: #333;
-            border: 2px solid #dee2e6;
+            border: 2px solid #e9ecef;
         }
 
-        .btn-secondary:hover {
-            background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
 
         .divider {
-            text-align: center;
             margin: 20px 0;
+            text-align: center;
             position: relative;
-            color: #666;
         }
 
         .divider::before {
@@ -127,199 +118,213 @@
             left: 0;
             right: 0;
             height: 1px;
-            background: #e1e5e9;
+            background: #e9ecef;
         }
 
         .divider span {
             background: rgba(255, 255, 255, 0.95);
             padding: 0 15px;
-        }
-
-        .register-form {
-            display: none;
-        }
-
-        .form-toggle {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .form-toggle a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .form-toggle a:hover {
-            text-decoration: underline;
-        }
-
-        .guest-access {
-            text-align: center;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #e1e5e9;
-        }
-
-        .guest-access p {
             color: #666;
-            margin-bottom: 15px;
+        }
+
+        .device-info {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
             font-size: 14px;
+            color: #666;
+        }
+
+        .device-info strong {
+            color: #333;
+        }
+
+        .sync-options {
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .sync-title {
+            font-weight: bold;
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+
+        .sync-option {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sync-option input[type="radio"] {
+            margin: 0;
+        }
+
+        .sync-option label {
+            margin: 0;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .export-import {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 14px;
+            flex: 1;
+        }
+
+        .data-code {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+            max-height: 100px;
+            overflow-y: auto;
+            margin-top: 10px;
         }
 
         .toast {
             position: fixed;
             top: 20px;
             right: 20px;
-            padding: 15px 25px;
-            border-radius: 10px;
+            padding: 12px 20px;
+            border-radius: 6px;
             color: white;
-            font-weight: bold;
-            z-index: 1000;
+            font-size: 14px;
+            z-index: 10000;
             opacity: 0;
-            transform: translateX(100%);
             transition: all 0.3s ease;
+        }
+
+        .toast.success {
+            background: #28a745;
+        }
+
+        .toast.error {
+            background: #dc3545;
+        }
+
+        .toast.info {
+            background: #17a2b8;
         }
 
         .toast.show {
             opacity: 1;
-            transform: translateX(0);
-        }
-
-        .toast.success {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        }
-
-        .toast.error {
-            background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
-        }
-
-        .toast.info {
-            background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%);
         }
 
         @media (max-width: 480px) {
             .login-container {
-                margin: 20px;
-                padding: 30px 25px;
+                padding: 30px 20px;
+                margin: 10px;
             }
 
-            .logo h1 {
-                font-size: 28px;
+            .title {
+                font-size: 24px;
             }
-        }
 
-        .features {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #e1e5e9;
-        }
-
-        .features h3 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-
-        .feature-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .feature-list li {
-            padding: 8px 0;
-            color: #666;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-        }
-
-        .feature-list li::before {
-            content: "✓";
-            color: #28a745;
-            font-weight: bold;
-            margin-right: 10px;
+            .export-import {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
     <div class="login-container">
-        <div class="logo">
-            <h1>定/销货单系统</h1>
-            <p>厦门汇仕环保科技有限公司</p>
+        <div class="logo">🏢</div>
+        <h1 class="title">购销单管理系统</h1>
+        <p class="subtitle">厦门汇仕环保科技有限公司</p>
+
+        <div class="device-info">
+            <strong>当前设备信息：</strong><br>
+            <span id="deviceInfo">检测中...</span>
         </div>
 
-        <!-- 登录表单 -->
-        <form id="loginForm" class="login-form">
-            <div class="form-group">
-                <label for="loginUsername">用户名</label>
-                <input type="text" id="loginUsername" name="username" placeholder="请输入用户名" required>
+        <div class="sync-options">
+            <div class="sync-title">🔄 跨设备数据同步</div>
+            <div class="sync-option">
+                <input type="radio" id="localMode" name="syncMode" value="local" checked>
+                <label for="localMode">本地模式（仅当前设备）</label>
             </div>
-            <div class="form-group">
-                <label for="loginPassword">密码</label>
-                <input type="password" id="loginPassword" name="password" placeholder="请输入密码" required>
+            <div class="sync-option">
+                <input type="radio" id="exportMode" name="syncMode" value="export">
+                <label for="exportMode">导出/导入模式（跨设备同步）</label>
             </div>
-            <button type="submit" class="btn">🔐 登录系统</button>
-        </form>
+            
+            <div class="export-import" id="exportImportSection" style="display: none;">
+                <button class="btn btn-secondary btn-small" onclick="exportUserData()">📤 导出数据</button>
+                <button class="btn btn-secondary btn-small" onclick="importUserData()">📥 导入数据</button>
+            </div>
+            
+            <div id="dataCodeSection" style="display: none;">
+                <textarea class="data-code" id="dataCodeInput" placeholder="请粘贴从其他设备导出的数据代码..."></textarea>
+                <button class="btn btn-primary btn-small" onclick="processImportData()" style="margin-top: 10px; width: 100%;">确认导入</button>
+            </div>
+        </div>
 
-        <!-- 注册表单 -->
-        <form id="registerForm" class="register-form">
+        <form id="loginForm">
             <div class="form-group">
-                <label for="registerUsername">用户名</label>
-                <input type="text" id="registerUsername" name="username" placeholder="请输入用户名" required>
+                <label class="form-label" for="username">用户名</label>
+                <input type="text" id="username" class="form-input" placeholder="请输入用户名" required>
             </div>
+            
             <div class="form-group">
-                <label for="registerEmail">邮箱</label>
-                <input type="email" id="registerEmail" name="email" placeholder="请输入邮箱" required>
+                <label class="form-label" for="password">密码</label>
+                <input type="password" id="password" class="form-input" placeholder="请输入密码" required>
             </div>
-            <div class="form-group">
-                <label for="registerPassword">密码</label>
-                <input type="password" id="registerPassword" name="password" placeholder="请输入密码" required>
-            </div>
-            <div class="form-group">
-                <label for="confirmPassword">确认密码</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="请再次输入密码" required>
-            </div>
-            <button type="submit" class="btn">📝 注册账号</button>
+            
+            <button type="submit" class="btn btn-primary">🔐 登录</button>
         </form>
 
         <div class="divider">
             <span>或</span>
         </div>
 
-        <div class="guest-access">
-            <p>无需注册，直接体验系统功能</p>
-            <button class="btn btn-secondary" onclick="guestLogin()">🚀 游客访问</button>
-        </div>
+        <button class="btn btn-secondary" onclick="showRegister()">👤 注册新账户</button>
 
-        <div class="form-toggle">
-            <p id="toggleText">还没有账号？ <a href="#" onclick="toggleForm()">立即注册</a></p>
-        </div>
-
-        <div class="features">
-            <h3>🌟 系统功能</h3>
-            <ul class="feature-list">
-                <li>智能价格匹配系统</li>
-                <li>预算/结算模式切换</li>
-                <li>完美A4打印效果</li>
-                <li>历史订单管理</li>
-                <li>自动计算和大写转换</li>
-                <li>数据本地存储</li>
-            </ul>
+        <div id="registerSection" style="display: none; margin-top: 20px;">
+            <form id="registerForm">
+                <div class="form-group">
+                    <label class="form-label" for="newUsername">新用户名</label>
+                    <input type="text" id="newUsername" class="form-input" placeholder="请输入用户名" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="newPassword">新密码</label>
+                    <input type="password" id="newPassword" class="form-input" placeholder="请输入密码" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="confirmPassword">确认密码</label>
+                    <input type="password" id="confirmPassword" class="form-input" placeholder="请再次输入密码" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">✅ 注册</button>
+                <button type="button" class="btn btn-secondary" onclick="hideRegister()">❌ 取消</button>
+            </form>
         </div>
     </div>
 
     <script>
-        let isLoginForm = true;
-
-        // 显示提示消息
+        // 显示消息提示
         function showToast(message, type = 'info') {
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
             toast.textContent = message;
             document.body.appendChild(toast);
-
+            
             setTimeout(() => toast.classList.add('show'), 100);
             setTimeout(() => {
                 toast.classList.remove('show');
@@ -331,22 +336,125 @@
             }, 3000);
         }
 
-        // 切换登录/注册表单
-        function toggleForm() {
-            const loginForm = document.getElementById('loginForm');
-            const registerForm = document.getElementById('registerForm');
-            const toggleText = document.getElementById('toggleText');
-
-            if (isLoginForm) {
-                loginForm.style.display = 'none';
-                registerForm.style.display = 'block';
-                toggleText.innerHTML = '已有账号？ <a href="#" onclick="toggleForm()">立即登录</a>';
-                isLoginForm = false;
+        // 获取设备信息
+        function getDeviceInfo() {
+            const userAgent = navigator.userAgent;
+            let deviceType = '未知设备';
+            let browser = '未知浏览器';
+            
+            // 检测设备类型
+            if (/Mobile|Android|iPhone|iPad/.test(userAgent)) {
+                deviceType = '移动设备';
             } else {
-                loginForm.style.display = 'block';
-                registerForm.style.display = 'none';
-                toggleText.innerHTML = '还没有账号？ <a href="#" onclick="toggleForm()">立即注册</a>';
-                isLoginForm = true;
+                deviceType = 'PC设备';
+            }
+            
+            // 检测浏览器
+            if (userAgent.includes('Chrome')) {
+                browser = 'Chrome';
+            } else if (userAgent.includes('Firefox')) {
+                browser = 'Firefox';
+            } else if (userAgent.includes('Safari')) {
+                browser = 'Safari';
+            } else if (userAgent.includes('Edge')) {
+                browser = 'Edge';
+            }
+            
+            return `${deviceType} - ${browser}`;
+        }
+
+        // 生成设备唯一标识
+        function getDeviceId() {
+            let deviceId = localStorage.getItem('deviceId');
+            if (!deviceId) {
+                deviceId = 'device_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('deviceId', deviceId);
+            }
+            return deviceId;
+        }
+
+        // 获取用户存储键名
+        function getUserStorageKey(username) {
+            const syncMode = document.querySelector('input[name="syncMode"]:checked').value;
+            if (syncMode === 'local') {
+                return `user_${username}_${getDeviceId()}`;
+            } else {
+                return `user_${username}_global`;
+            }
+        }
+
+        // 显示/隐藏注册表单
+        function showRegister() {
+            document.getElementById('registerSection').style.display = 'block';
+        }
+
+        function hideRegister() {
+            document.getElementById('registerSection').style.display = 'none';
+        }
+
+        // 导出用户数据
+        function exportUserData() {
+            try {
+                const allData = {};
+                
+                // 导出所有用户数据
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key.startsWith('user_') || key === 'orderHistory' || key === 'purchaseOrderData') {
+                        allData[key] = localStorage.getItem(key);
+                    }
+                }
+                
+                const dataCode = btoa(JSON.stringify(allData));
+                
+                // 创建下载链接
+                const blob = new Blob([dataCode], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `购销单系统数据_${new Date().toISOString().split('T')[0]}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showToast('数据导出成功！请保存好导出的文件', 'success');
+            } catch (error) {
+                console.error('导出失败:', error);
+                showToast('数据导出失败', 'error');
+            }
+        }
+
+        // 导入用户数据
+        function importUserData() {
+            document.getElementById('dataCodeSection').style.display = 'block';
+            showToast('请粘贴从其他设备导出的数据代码', 'info');
+        }
+
+        // 处理导入数据
+        function processImportData() {
+            const dataCode = document.getElementById('dataCodeInput').value.trim();
+            if (!dataCode) {
+                showToast('请输入数据代码', 'error');
+                return;
+            }
+            
+            try {
+                const allData = JSON.parse(atob(dataCode));
+                
+                // 确认导入
+                if (confirm('导入数据将覆盖当前设备的所有数据，确定要继续吗？')) {
+                    Object.keys(allData).forEach(key => {
+                        localStorage.setItem(key, allData[key]);
+                    });
+                    
+                    showToast('数据导入成功！', 'success');
+                    document.getElementById('dataCodeSection').style.display = 'none';
+                    document.getElementById('dataCodeInput').value = '';
+                }
+            } catch (error) {
+                console.error('导入失败:', error);
+                showToast('数据代码格式错误，导入失败', 'error');
             }
         }
 
@@ -354,106 +462,112 @@
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const username = document.getElementById('loginUsername').value;
-            const password = document.getElementById('loginPassword').value;
-
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            
             if (!username || !password) {
-                showToast('请填写完整的登录信息', 'error');
+                showToast('请输入用户名和密码', 'error');
                 return;
             }
-
-            // 检查用户是否存在
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
-            const user = users.find(u => u.username === username && u.password === password);
-
-            if (user) {
-                // 登录成功
-                localStorage.setItem('currentUser', JSON.stringify(user));
-                showToast('登录成功！正在跳转...', 'success');
-                
-                setTimeout(() => {
-                    window.location.href = 'order.html';
-                }, 1500);
-            } else {
-                showToast('用户名或密码错误', 'error');
+            
+            const userKey = getUserStorageKey(username);
+            const userData = localStorage.getItem(userKey);
+            
+            if (!userData) {
+                showToast('用户不存在，请先注册', 'error');
+                return;
             }
+            
+            const user = JSON.parse(userData);
+            if (user.password !== password) {
+                showToast('密码错误', 'error');
+                return;
+            }
+            
+            // 登录成功
+            const currentUser = {
+                username: username,
+                loginTime: new Date().toLocaleString('zh-CN'),
+                deviceInfo: getDeviceInfo(),
+                deviceId: getDeviceId()
+            };
+            
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            showToast('登录成功！正在跳转...', 'success');
+            
+            setTimeout(() => {
+                window.location.href = 'order.html';
+            }, 1500);
         });
 
         // 注册处理
         document.getElementById('registerForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const username = document.getElementById('registerUsername').value;
-            const email = document.getElementById('registerEmail').value;
-            const password = document.getElementById('registerPassword').value;
+            const username = document.getElementById('newUsername').value.trim();
+            const password = document.getElementById('newPassword').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
-
-            if (!username || !email || !password || !confirmPassword) {
-                showToast('请填写完整的注册信息', 'error');
+            
+            if (!username || !password || !confirmPassword) {
+                showToast('请填写所有字段', 'error');
                 return;
             }
-
+            
             if (password !== confirmPassword) {
                 showToast('两次输入的密码不一致', 'error');
                 return;
             }
-
+            
             if (password.length < 6) {
                 showToast('密码长度至少6位', 'error');
                 return;
             }
-
-            // 检查用户名是否已存在
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
-            if (users.find(u => u.username === username)) {
+            
+            const userKey = getUserStorageKey(username);
+            if (localStorage.getItem(userKey)) {
                 showToast('用户名已存在', 'error');
                 return;
             }
-
-            if (users.find(u => u.email === email)) {
-                showToast('邮箱已被注册', 'error');
-                return;
-            }
-
-            // 注册新用户
-            const newUser = {
-                id: Date.now(),
-                username: username,
-                email: email,
-                password: password,
-                registerTime: new Date().toLocaleString('zh-CN')
-            };
-
-            users.push(newUser);
-            localStorage.setItem('users', JSON.stringify(users));
-            localStorage.setItem('currentUser', JSON.stringify(newUser));
-
-            showToast('注册成功！正在跳转...', 'success');
             
-            setTimeout(() => {
-                window.location.href = 'order.html';
-            }, 1500);
+            // 注册成功
+            const userData = {
+                username: username,
+                password: password,
+                registerTime: new Date().toLocaleString('zh-CN'),
+                deviceInfo: getDeviceInfo(),
+                deviceId: getDeviceId()
+            };
+            
+            localStorage.setItem(userKey, JSON.stringify(userData));
+            showToast('注册成功！请登录', 'success');
+            
+            // 清空注册表单并隐藏
+            document.getElementById('registerForm').reset();
+            hideRegister();
+            
+            // 自动填入用户名
+            document.getElementById('username').value = username;
         });
 
-        // 游客登录
-        function guestLogin() {
-            const guestUser = {
-                id: 'guest',
-                username: '游客用户',
-                email: 'guest@example.com',
-                isGuest: true
-            };
+        // 同步模式切换
+        document.querySelectorAll('input[name="syncMode"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const exportImportSection = document.getElementById('exportImportSection');
+                if (this.value === 'export') {
+                    exportImportSection.style.display = 'flex';
+                } else {
+                    exportImportSection.style.display = 'none';
+                    document.getElementById('dataCodeSection').style.display = 'none';
+                }
+            });
+        });
 
-            localStorage.setItem('currentUser', JSON.stringify(guestUser));
-            showToast('游客登录成功！正在跳转...', 'success');
-            
-            setTimeout(() => {
-                window.location.href = 'order.html';
-            }, 1500);
-        }
-
-        // 页面加载时检查是否已登录
+        // 页面加载时初始化
         document.addEventListener('DOMContentLoaded', function() {
+            // 显示设备信息
+            document.getElementById('deviceInfo').textContent = getDeviceInfo();
+            
+            // 检查是否已登录
             const currentUser = localStorage.getItem('currentUser');
             if (currentUser) {
                 const user = JSON.parse(currentUser);
@@ -461,23 +575,6 @@
                 setTimeout(() => {
                     window.location.href = 'order.html';
                 }, 1500);
-            }
-        });
-
-        // 创建默认管理员账号
-        document.addEventListener('DOMContentLoaded', function() {
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
-            if (users.length === 0) {
-                const adminUser = {
-                    id: 1,
-                    username: 'admin',
-                    email: 'admin@huishi.com',
-                    password: '123456',
-                    registerTime: new Date().toLocaleString('zh-CN'),
-                    isAdmin: true
-                };
-                users.push(adminUser);
-                localStorage.setItem('users', JSON.stringify(users));
             }
         });
     </script>
