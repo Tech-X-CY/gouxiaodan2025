@@ -137,46 +137,44 @@
             display: block;
         }
 
-        .sync-code-display {
+        .qr-display {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin: 15px 0;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qr-placeholder {
+            font-size: 48px;
+            color: #ccc;
+            margin-bottom: 10px;
+        }
+
+        .data-code-display {
             background: white;
             border: 2px solid #e9ecef;
             border-radius: 8px;
             padding: 15px;
-            text-align: center;
             font-family: 'Courier New', monospace;
-            font-size: 20px;
-            font-weight: bold;
-            letter-spacing: 3px;
-            color: #667eea;
+            font-size: 12px;
+            line-height: 1.4;
+            max-height: 150px;
+            overflow-y: auto;
+            word-break: break-all;
             margin: 15px 0;
-            min-height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             position: relative;
-        }
-
-        .sync-code-input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            font-size: 16px;
-            text-align: center;
-            letter-spacing: 2px;
-            outline: none;
-            margin-bottom: 15px;
-        }
-
-        .sync-code-input:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
         .data-area {
             width: 100%;
-            height: 100px;
+            height: 120px;
             padding: 10px;
             border: 1px solid #e9ecef;
             border-radius: 5px;
@@ -392,11 +390,9 @@
 
             <!-- 二维码同步区域 -->
             <div class="sync-area" id="qrSyncArea">
-                <div id="qrCodeDisplay" style="text-align: center; margin: 15px 0;">
-                    <div style="border: 2px dashed #ccc; padding: 20px; border-radius: 8px;">
-                        <div style="font-size: 48px; margin-bottom: 10px;">📱</div>
-                        <div>点击下方按钮生成二维码</div>
-                    </div>
+                <div class="qr-display" id="qrCodeDisplay">
+                    <div class="qr-placeholder">📱</div>
+                    <div>点击下方按钮生成二维码</div>
                 </div>
                 <button class="btn btn-success btn-small" onclick="generateQRCode()">📱 生成二维码</button>
                 <div class="help-text">
@@ -406,7 +402,7 @@
 
             <!-- 数据码同步区域 -->
             <div class="sync-area" id="codeSyncArea">
-                <div class="sync-code-display" id="dataCodeDisplay">
+                <div class="data-code-display" id="dataCodeDisplay">
                     点击下方按钮生成数据码
                 </div>
                 <button class="btn btn-warning btn-small" onclick="generateDataCode()">🔢 生成数据码</button>
@@ -508,7 +504,7 @@
             localStorage.setItem('syncMethod', method);
         }
 
-        // 生成二维码
+        // 生成二维码 - 修复版本
         function generateQRCode() {
             try {
                 // 收集所有数据
@@ -524,24 +520,47 @@
                 allData._exportTime = new Date().toISOString();
                 allData._exportDevice = 'QR Code';
                 
-                // 生成数据字符串
+                // 生成数据字符串并压缩
                 const dataString = JSON.stringify(allData);
-                const encodedData = btoa(encodeURIComponent(dataString));
                 
-                // 使用在线二维码生成服务
-                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(encodedData)}`;
+                // 使用简单的Base64编码
+                let encodedData;
+                try {
+                    encodedData = btoa(unescape(encodeURIComponent(dataString)));
+                } catch (e) {
+                    // 如果数据太大，进行压缩
+                    const compressedData = {
+                        users: Object.keys(allData).filter(k => k.startsWith('user_')).length,
+                        orders: allData.orderHistory ? JSON.parse(allData.orderHistory).length : 0,
+                        _exportTime: allData._exportTime,
+                        _note: '数据过大，请使用数据码同步'
+                    };
+                    encodedData = btoa(JSON.stringify(compressedData));
+                }
+                
+                // 创建二维码URL - 使用多个备用服务
+                const qrServices = [
+                    `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(encodedData)}`,
+                    `https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=${encodeURIComponent(encodedData)}`,
+                    `https://qr-server.com/api/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(encodedData)}`
+                ];
                 
                 // 显示二维码
                 const qrDisplay = document.getElementById('qrCodeDisplay');
                 qrDisplay.innerHTML = `
                     <div style="border: 2px solid #4caf50; padding: 15px; border-radius: 8px; background: white;">
-                        <img src="${qrUrl}" alt="数据同步二维码" style="max-width: 200px; height: auto;">
+                        <img src="${qrServices[0]}" alt="数据同步二维码" 
+                             style="max-width: 180px; height: auto; display: block; margin: 0 auto;"
+                             onerror="this.src='${qrServices[1]}'; this.onerror=function(){this.src='${qrServices[2]}'};">
                         <div style="margin-top: 10px; font-size: 14px; color: #666;">
                             使用手机扫描此二维码<br>
-                            或保存图片到其他设备
+                            获取数据同步信息
                         </div>
-                        <button class="btn btn-secondary btn-small" onclick="downloadQRCode('${qrUrl}')" style="margin-top: 10px;">
-                            💾 保存二维码
+                        <button class="btn btn-secondary btn-small" onclick="downloadQRData('${encodedData}')" style="margin-top: 10px;">
+                            💾 下载数据文件
+                        </button>
+                        <button class="btn btn-warning btn-small" onclick="copyQRData('${encodedData}')" style="margin-top: 5px;">
+                            📋 复制数据码
                         </button>
                     </div>
                 `;
@@ -550,22 +569,78 @@
                 
             } catch (error) {
                 console.error('生成二维码失败:', error);
-                showToast('二维码生成失败', 'error');
+                showToast('二维码生成失败，请尝试数据码同步', 'error');
+                
+                // 显示错误信息和备用方案
+                const qrDisplay = document.getElementById('qrCodeDisplay');
+                qrDisplay.innerHTML = `
+                    <div style="border: 2px solid #dc3545; padding: 15px; border-radius: 8px; background: #fff5f5;">
+                        <div style="color: #dc3545; font-size: 48px; margin-bottom: 10px;">❌</div>
+                        <div style="color: #dc3545; font-weight: bold;">二维码生成失败</div>
+                        <div style="font-size: 12px; color: #666; margin-top: 10px;">
+                            数据可能过大，请使用"数据码同步"方案
+                        </div>
+                        <button class="btn btn-warning btn-small" onclick="selectSyncMethod('code')" style="margin-top: 10px;">
+                            🔢 切换到数据码同步
+                        </button>
+                    </div>
+                `;
             }
         }
 
-        // 下载二维码
-        function downloadQRCode(url) {
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `购销单数据二维码_${new Date().toISOString().split('T')[0]}.png`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            showToast('二维码已保存', 'success');
+        // 下载二维码数据
+        function downloadQRData(encodedData) {
+            try {
+                const blob = new Blob([encodedData], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `购销单二维码数据_${new Date().toISOString().split('T')[0]}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast('数据文件已下载', 'success');
+            } catch (error) {
+                showToast('下载失败', 'error');
+            }
         }
 
-        // 生成数据码
+        // 复制二维码数据
+        function copyQRData(encodedData) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(encodedData).then(() => {
+                    showToast('数据码已复制到剪贴板', 'success');
+                }).catch(() => {
+                    fallbackCopy(encodedData);
+                });
+            } else {
+                fallbackCopy(encodedData);
+            }
+        }
+
+        // 备用复制方法
+        function fallbackCopy(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showToast('数据码已复制到剪贴板', 'success');
+            } catch (err) {
+                showToast('复制失败，请手动复制', 'error');
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        // 生成数据码 - 修复版本
         function generateDataCode() {
             try {
                 // 收集所有数据
@@ -580,45 +655,70 @@
                 // 添加元数据
                 allData._exportTime = new Date().toISOString();
                 allData._exportDevice = 'Data Code';
+                allData._version = '1.0';
                 
                 // 生成数据码
-                const dataCode = btoa(JSON.stringify(allData));
+                const dataString = JSON.stringify(allData);
+                let dataCode;
+                
+                try {
+                    dataCode = btoa(unescape(encodeURIComponent(dataString)));
+                } catch (e) {
+                    // 如果编码失败，使用简单编码
+                    dataCode = btoa(dataString);
+                }
                 
                 // 显示数据码
                 const codeDisplay = document.getElementById('dataCodeDisplay');
                 codeDisplay.innerHTML = `
-                    <div style="word-break: break-all; font-size: 12px; line-height: 1.4; max-height: 100px; overflow-y: auto;">
+                    <div style="word-break: break-all; font-size: 11px; line-height: 1.3; max-height: 120px; overflow-y: auto; padding-right: 30px;">
                         ${dataCode}
                     </div>
                     <button class="copy-btn" onclick="copyDataCode('${dataCode}')">复制</button>
                 `;
                 
-                // 创建下载文件
-                const blob = new Blob([dataCode], { type: 'text/plain' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `购销单数据码_${new Date().toISOString().split('T')[0]}.txt`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                
-                showToast('数据码生成成功！已自动下载文件', 'success');
+                // 自动下载文件
+                try {
+                    const blob = new Blob([dataCode], { type: 'text/plain;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `购销单数据码_${new Date().toISOString().split('T')[0]}.txt`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    showToast('数据码生成成功！文件已自动下载', 'success');
+                } catch (downloadError) {
+                    showToast('数据码生成成功！请手动复制', 'success');
+                }
                 
             } catch (error) {
                 console.error('生成数据码失败:', error);
                 showToast('数据码生成失败', 'error');
+                
+                const codeDisplay = document.getElementById('dataCodeDisplay');
+                codeDisplay.innerHTML = `
+                    <div style="color: #dc3545; text-align: center; padding: 20px;">
+                        ❌ 生成失败<br>
+                        <small>请检查数据完整性</small>
+                    </div>
+                `;
             }
         }
 
-        // 复制数据码
+        // 复制数据码 - 修复版本
         function copyDataCode(code) {
-            navigator.clipboard.writeText(code).then(() => {
-                showToast('数据码已复制到剪贴板', 'success');
-            }).catch(() => {
-                showToast('复制失败，请手动复制', 'error');
-            });
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(code).then(() => {
+                    showToast('数据码已复制到剪贴板', 'success');
+                }).catch(() => {
+                    fallbackCopy(code);
+                });
+            } else {
+                fallbackCopy(code);
+            }
         }
 
         // 显示导入区域
@@ -628,7 +728,7 @@
             showToast('请粘贴数据码', 'info');
         }
 
-        // 导入数据码
+        // 导入数据码 - 修复版本
         function importDataCode() {
             const dataCode = document.getElementById('importDataArea').value.trim();
             if (!dataCode) {
@@ -637,7 +737,22 @@
             }
             
             try {
-                const allData = JSON.parse(atob(dataCode));
+                let decodedString;
+                
+                // 尝试解码
+                try {
+                    decodedString = decodeURIComponent(escape(atob(dataCode)));
+                } catch (e) {
+                    // 备用解码方法
+                    decodedString = atob(dataCode);
+                }
+                
+                const allData = JSON.parse(decodedString);
+                
+                // 验证数据格式
+                if (!allData || typeof allData !== 'object') {
+                    throw new Error('数据格式不正确');
+                }
                 
                 if (confirm('导入数据将覆盖当前设备的所有数据，确定要继续吗？')) {
                     // 清除现有数据
@@ -651,13 +766,15 @@
                     keysToRemove.forEach(key => localStorage.removeItem(key));
                     
                     // 导入新数据
+                    let importCount = 0;
                     Object.keys(allData).forEach(key => {
                         if (!key.startsWith('_')) {
                             localStorage.setItem(key, allData[key]);
+                            importCount++;
                         }
                     });
                     
-                    showToast('数据导入成功！', 'success');
+                    showToast(`数据导入成功！导入了 ${importCount} 项数据`, 'success');
                     
                     // 清空输入区域
                     document.getElementById('importDataArea').value = '';
@@ -673,7 +790,7 @@
                 }
             } catch (error) {
                 console.error('导入失败:', error);
-                showToast('数据码格式错误，导入失败', 'error');
+                showToast('数据码格式错误或已损坏，导入失败', 'error');
             }
         }
 
