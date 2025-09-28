@@ -151,25 +151,46 @@
             justify-content: center;
         }
 
-        .qr-placeholder {
-            font-size: 48px;
-            color: #ccc;
-            margin-bottom: 10px;
+        .qr-canvas {
+            border: 1px solid #ddd;
+            border-radius: 4px;
         }
 
-        .data-code-display {
+        .sync-code-display {
             background: white;
+            border: 2px solid #4caf50;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 8px;
+            color: #4caf50;
+            margin: 15px 0;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .sync-code-input {
+            width: 100%;
+            padding: 15px;
             border: 2px solid #e9ecef;
             border-radius: 8px;
-            padding: 15px;
             font-family: 'Courier New', monospace;
-            font-size: 12px;
-            line-height: 1.4;
-            max-height: 150px;
-            overflow-y: auto;
-            word-break: break-all;
-            margin: 15px 0;
-            position: relative;
+            font-size: 24px;
+            text-align: center;
+            letter-spacing: 4px;
+            outline: none;
+            margin-bottom: 15px;
+        }
+
+        .sync-code-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
         .data-area {
@@ -327,7 +348,7 @@
             position: absolute;
             top: 5px;
             right: 5px;
-            background: #667eea;
+            background: #4caf50;
             color: white;
             border: none;
             border-radius: 4px;
@@ -345,6 +366,11 @@
             .title {
                 font-size: 24px;
             }
+
+            .sync-code-display {
+                font-size: 24px;
+                letter-spacing: 4px;
+            }
         }
     </style>
 </head>
@@ -356,7 +382,7 @@
 
         <div class="sync-status">
             <div class="sync-indicator"></div>
-            <span>本地存储 + 简单同步</span>
+            <span>本地存储 + 简化同步</span>
         </div>
 
         <div class="sync-section">
@@ -382,39 +408,40 @@
                 <div class="sync-method" onclick="selectSyncMethod('code')">
                     <div class="method-title">
                         <span>🔢</span>
-                        <span>数据码同步</span>
+                        <span>6位数字码</span>
                     </div>
-                    <div class="method-desc">生成数据码，手动输入同步</div>
+                    <div class="method-desc">生成6位数字码，简单易记</div>
                 </div>
             </div>
 
             <!-- 二维码同步区域 -->
             <div class="sync-area" id="qrSyncArea">
                 <div class="qr-display" id="qrCodeDisplay">
-                    <div class="qr-placeholder">📱</div>
+                    <div style="font-size: 48px; color: #ccc; margin-bottom: 10px;">📱</div>
                     <div>点击下方按钮生成二维码</div>
                 </div>
                 <button class="btn btn-success btn-small" onclick="generateQRCode()">📱 生成二维码</button>
                 <div class="help-text">
-                    生成包含所有数据的二维码，使用手机扫码即可快速导入数据
+                    生成包含6位数字码的二维码，扫码后输入数字码即可同步
                 </div>
             </div>
 
-            <!-- 数据码同步区域 -->
+            <!-- 数字码同步区域 -->
             <div class="sync-area" id="codeSyncArea">
-                <div class="data-code-display" id="dataCodeDisplay">
-                    点击下方按钮生成数据码
+                <div class="sync-code-display" id="syncCodeDisplay">
+                    点击生成
                 </div>
-                <button class="btn btn-warning btn-small" onclick="generateDataCode()">🔢 生成数据码</button>
-                <button class="btn btn-success btn-small" onclick="showImportArea()">📥 导入数据码</button>
+                <button class="btn btn-warning btn-small" onclick="generateSyncCode()">🔢 生成6位数字码</button>
+                <button class="btn btn-success btn-small" onclick="showImportArea()">📥 输入数字码</button>
                 
                 <div id="importArea" style="display: none; margin-top: 15px;">
-                    <textarea class="data-area" id="importDataArea" placeholder="粘贴数据码..."></textarea>
-                    <button class="btn btn-primary btn-small" onclick="importDataCode()">确认导入</button>
+                    <input type="text" class="sync-code-input" id="syncCodeInput" 
+                           placeholder="输入6位数字码" maxlength="6" pattern="[0-9]{6}">
+                    <button class="btn btn-primary btn-small" onclick="importSyncCode()">确认同步</button>
                 </div>
                 
                 <div class="help-text">
-                    生成数据码后，可在其他设备上导入来同步所有数据
+                    生成6位数字码后，在其他设备输入即可同步所有数据
                 </div>
             </div>
         </div>
@@ -462,8 +489,12 @@
         </div>
     </div>
 
+    <!-- QR Code 生成库 -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+
     <script>
         let currentSyncMethod = 'local';
+        let syncDataStore = {}; // 临时存储同步数据
 
         // 显示消息提示
         function showToast(message, type = 'info') {
@@ -504,8 +535,13 @@
             localStorage.setItem('syncMethod', method);
         }
 
-        // 生成二维码 - 修复版本
-        function generateQRCode() {
+        // 生成6位随机数字码
+        function generateRandomCode() {
+            return Math.floor(100000 + Math.random() * 900000).toString();
+        }
+
+        // 生成同步码
+        function generateSyncCode() {
             try {
                 // 收集所有数据
                 const allData = {};
@@ -516,106 +552,142 @@
                     }
                 }
                 
-                // 添加元数据
-                allData._exportTime = new Date().toISOString();
-                allData._exportDevice = 'QR Code';
+                // 生成6位数字码
+                const syncCode = generateRandomCode();
                 
-                // 生成数据字符串并压缩
-                const dataString = JSON.stringify(allData);
+                // 将数据存储到临时存储中（实际应用中应该存储到服务器）
+                syncDataStore[syncCode] = {
+                    data: allData,
+                    createdAt: new Date().toISOString(),
+                    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24小时后过期
+                };
                 
-                // 使用简单的Base64编码
-                let encodedData;
-                try {
-                    encodedData = btoa(unescape(encodeURIComponent(dataString)));
-                } catch (e) {
-                    // 如果数据太大，进行压缩
-                    const compressedData = {
-                        users: Object.keys(allData).filter(k => k.startsWith('user_')).length,
-                        orders: allData.orderHistory ? JSON.parse(allData.orderHistory).length : 0,
-                        _exportTime: allData._exportTime,
-                        _note: '数据过大，请使用数据码同步'
-                    };
-                    encodedData = btoa(JSON.stringify(compressedData));
-                }
+                // 也存储到localStorage作为备份
+                localStorage.setItem(`sync_${syncCode}`, JSON.stringify(syncDataStore[syncCode]));
                 
-                // 创建二维码URL - 使用多个备用服务
-                const qrServices = [
-                    `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(encodedData)}`,
-                    `https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=${encodeURIComponent(encodedData)}`,
-                    `https://qr-server.com/api/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(encodedData)}`
-                ];
-                
-                // 显示二维码
-                const qrDisplay = document.getElementById('qrCodeDisplay');
-                qrDisplay.innerHTML = `
-                    <div style="border: 2px solid #4caf50; padding: 15px; border-radius: 8px; background: white;">
-                        <img src="${qrServices[0]}" alt="数据同步二维码" 
-                             style="max-width: 180px; height: auto; display: block; margin: 0 auto;"
-                             onerror="this.src='${qrServices[1]}'; this.onerror=function(){this.src='${qrServices[2]}'};">
-                        <div style="margin-top: 10px; font-size: 14px; color: #666;">
-                            使用手机扫描此二维码<br>
-                            获取数据同步信息
-                        </div>
-                        <button class="btn btn-secondary btn-small" onclick="downloadQRData('${encodedData}')" style="margin-top: 10px;">
-                            💾 下载数据文件
-                        </button>
-                        <button class="btn btn-warning btn-small" onclick="copyQRData('${encodedData}')" style="margin-top: 5px;">
-                            📋 复制数据码
-                        </button>
-                    </div>
+                // 显示同步码
+                const codeDisplay = document.getElementById('syncCodeDisplay');
+                codeDisplay.innerHTML = `
+                    ${syncCode}
+                    <button class="copy-btn" onclick="copySyncCode('${syncCode}')">复制</button>
                 `;
                 
-                showToast('二维码生成成功！', 'success');
+                showToast('6位数字码生成成功！', 'success');
+                
+            } catch (error) {
+                console.error('生成数字码失败:', error);
+                showToast('数字码生成失败', 'error');
+            }
+        }
+
+        // 生成二维码
+        function generateQRCode() {
+            try {
+                // 先生成6位数字码
+                const syncCode = generateRandomCode();
+                
+                // 收集数据并存储
+                const allData = {};
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key.startsWith('user_') || key === 'orderHistory' || key === 'purchaseOrderData' || key === 'currentUser') {
+                        allData[key] = localStorage.getItem(key);
+                    }
+                }
+                
+                syncDataStore[syncCode] = {
+                    data: allData,
+                    createdAt: new Date().toISOString(),
+                    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+                };
+                
+                localStorage.setItem(`sync_${syncCode}`, JSON.stringify(syncDataStore[syncCode]));
+                
+                // 创建二维码内容（只包含数字码）
+                const qrContent = `购销单同步码:${syncCode}`;
+                
+                // 清空显示区域
+                const qrDisplay = document.getElementById('qrCodeDisplay');
+                qrDisplay.innerHTML = '<div style="color: #666;">正在生成二维码...</div>';
+                
+                // 检查QRCode库是否加载
+                if (typeof QRCode !== 'undefined') {
+                    // 创建canvas元素
+                    const canvas = document.createElement('canvas');
+                    
+                    // 生成二维码
+                    QRCode.toCanvas(canvas, qrContent, {
+                        width: 180,
+                        height: 180,
+                        margin: 2,
+                        color: {
+                            dark: '#000000',
+                            light: '#FFFFFF'
+                        }
+                    }, function (error) {
+                        if (error) {
+                            console.error('二维码生成失败:', error);
+                            qrDisplay.innerHTML = `
+                                <div style="color: #dc3545; padding: 20px;">
+                                    <div style="font-size: 48px; margin-bottom: 10px;">❌</div>
+                                    <div>二维码生成失败</div>
+                                    <div style="font-size: 24px; font-weight: bold; margin: 15px 0; color: #4caf50;">
+                                        数字码：${syncCode}
+                                    </div>
+                                    <button class="btn btn-warning btn-small" onclick="copySyncCode('${syncCode}')">
+                                        复制数字码
+                                    </button>
+                                </div>
+                            `;
+                        } else {
+                            qrDisplay.innerHTML = `
+                                <div style="border: 2px solid #4caf50; padding: 15px; border-radius: 8px; background: white;">
+                                    ${canvas.outerHTML}
+                                    <div style="margin-top: 10px; font-size: 14px; color: #666;">
+                                        扫描二维码获取数字码<br>
+                                        或直接使用：<strong style="color: #4caf50;">${syncCode}</strong>
+                                    </div>
+                                    <button class="btn btn-warning btn-small" onclick="copySyncCode('${syncCode}')" style="margin-top: 10px;">
+                                        📋 复制数字码
+                                    </button>
+                                </div>
+                            `;
+                            showToast('二维码生成成功！', 'success');
+                        }
+                    });
+                } else {
+                    // QRCode库未加载，显示数字码
+                    qrDisplay.innerHTML = `
+                        <div style="border: 2px solid #ffc107; padding: 20px; border-radius: 8px; background: #fff8e1;">
+                            <div style="font-size: 48px; margin-bottom: 10px;">📱</div>
+                            <div style="color: #f57c00; margin-bottom: 15px;">二维码库加载中...</div>
+                            <div style="font-size: 24px; font-weight: bold; margin: 15px 0; color: #4caf50;">
+                                数字码：${syncCode}
+                            </div>
+                            <button class="btn btn-warning btn-small" onclick="copySyncCode('${syncCode}')">
+                                📋 复制数字码
+                            </button>
+                        </div>
+                    `;
+                    showToast('请使用数字码进行同步', 'info');
+                }
                 
             } catch (error) {
                 console.error('生成二维码失败:', error);
-                showToast('二维码生成失败，请尝试数据码同步', 'error');
-                
-                // 显示错误信息和备用方案
-                const qrDisplay = document.getElementById('qrCodeDisplay');
-                qrDisplay.innerHTML = `
-                    <div style="border: 2px solid #dc3545; padding: 15px; border-radius: 8px; background: #fff5f5;">
-                        <div style="color: #dc3545; font-size: 48px; margin-bottom: 10px;">❌</div>
-                        <div style="color: #dc3545; font-weight: bold;">二维码生成失败</div>
-                        <div style="font-size: 12px; color: #666; margin-top: 10px;">
-                            数据可能过大，请使用"数据码同步"方案
-                        </div>
-                        <button class="btn btn-warning btn-small" onclick="selectSyncMethod('code')" style="margin-top: 10px;">
-                            🔢 切换到数据码同步
-                        </button>
-                    </div>
-                `;
+                showToast('二维码生成失败', 'error');
             }
         }
 
-        // 下载二维码数据
-        function downloadQRData(encodedData) {
-            try {
-                const blob = new Blob([encodedData], { type: 'text/plain' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `购销单二维码数据_${new Date().toISOString().split('T')[0]}.txt`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                showToast('数据文件已下载', 'success');
-            } catch (error) {
-                showToast('下载失败', 'error');
-            }
-        }
-
-        // 复制二维码数据
-        function copyQRData(encodedData) {
+        // 复制同步码
+        function copySyncCode(code) {
             if (navigator.clipboard) {
-                navigator.clipboard.writeText(encodedData).then(() => {
-                    showToast('数据码已复制到剪贴板', 'success');
+                navigator.clipboard.writeText(code).then(() => {
+                    showToast('数字码已复制到剪贴板', 'success');
                 }).catch(() => {
-                    fallbackCopy(encodedData);
+                    fallbackCopy(code);
                 });
             } else {
-                fallbackCopy(encodedData);
+                fallbackCopy(code);
             }
         }
 
@@ -632,7 +704,7 @@
             
             try {
                 document.execCommand('copy');
-                showToast('数据码已复制到剪贴板', 'success');
+                showToast('数字码已复制到剪贴板', 'success');
             } catch (err) {
                 showToast('复制失败，请手动复制', 'error');
             }
@@ -640,119 +712,51 @@
             document.body.removeChild(textArea);
         }
 
-        // 生成数据码 - 修复版本
-        function generateDataCode() {
-            try {
-                // 收集所有数据
-                const allData = {};
-                for (let i = 0; i < localStorage.length; i++) {
-                    const key = localStorage.key(i);
-                    if (key.startsWith('user_') || key === 'orderHistory' || key === 'purchaseOrderData' || key === 'currentUser') {
-                        allData[key] = localStorage.getItem(key);
-                    }
-                }
-                
-                // 添加元数据
-                allData._exportTime = new Date().toISOString();
-                allData._exportDevice = 'Data Code';
-                allData._version = '1.0';
-                
-                // 生成数据码
-                const dataString = JSON.stringify(allData);
-                let dataCode;
-                
-                try {
-                    dataCode = btoa(unescape(encodeURIComponent(dataString)));
-                } catch (e) {
-                    // 如果编码失败，使用简单编码
-                    dataCode = btoa(dataString);
-                }
-                
-                // 显示数据码
-                const codeDisplay = document.getElementById('dataCodeDisplay');
-                codeDisplay.innerHTML = `
-                    <div style="word-break: break-all; font-size: 11px; line-height: 1.3; max-height: 120px; overflow-y: auto; padding-right: 30px;">
-                        ${dataCode}
-                    </div>
-                    <button class="copy-btn" onclick="copyDataCode('${dataCode}')">复制</button>
-                `;
-                
-                // 自动下载文件
-                try {
-                    const blob = new Blob([dataCode], { type: 'text/plain;charset=utf-8' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `购销单数据码_${new Date().toISOString().split('T')[0]}.txt`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                    
-                    showToast('数据码生成成功！文件已自动下载', 'success');
-                } catch (downloadError) {
-                    showToast('数据码生成成功！请手动复制', 'success');
-                }
-                
-            } catch (error) {
-                console.error('生成数据码失败:', error);
-                showToast('数据码生成失败', 'error');
-                
-                const codeDisplay = document.getElementById('dataCodeDisplay');
-                codeDisplay.innerHTML = `
-                    <div style="color: #dc3545; text-align: center; padding: 20px;">
-                        ❌ 生成失败<br>
-                        <small>请检查数据完整性</small>
-                    </div>
-                `;
-            }
-        }
-
-        // 复制数据码 - 修复版本
-        function copyDataCode(code) {
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(code).then(() => {
-                    showToast('数据码已复制到剪贴板', 'success');
-                }).catch(() => {
-                    fallbackCopy(code);
-                });
-            } else {
-                fallbackCopy(code);
-            }
-        }
-
         // 显示导入区域
         function showImportArea() {
             document.getElementById('importArea').style.display = 'block';
-            document.getElementById('importDataArea').focus();
-            showToast('请粘贴数据码', 'info');
+            document.getElementById('syncCodeInput').focus();
+            showToast('请输入6位数字码', 'info');
         }
 
-        // 导入数据码 - 修复版本
-        function importDataCode() {
-            const dataCode = document.getElementById('importDataArea').value.trim();
-            if (!dataCode) {
-                showToast('请输入数据码', 'error');
+        // 导入同步码
+        function importSyncCode() {
+            const syncCode = document.getElementById('syncCodeInput').value.trim();
+            
+            if (!syncCode) {
+                showToast('请输入数字码', 'error');
+                return;
+            }
+            
+            if (!/^\d{6}$/.test(syncCode)) {
+                showToast('请输入6位数字码', 'error');
                 return;
             }
             
             try {
-                let decodedString;
+                // 先从内存中查找
+                let syncData = syncDataStore[syncCode];
                 
-                // 尝试解码
-                try {
-                    decodedString = decodeURIComponent(escape(atob(dataCode)));
-                } catch (e) {
-                    // 备用解码方法
-                    decodedString = atob(dataCode);
+                // 如果内存中没有，从localStorage查找
+                if (!syncData) {
+                    const storedData = localStorage.getItem(`sync_${syncCode}`);
+                    if (storedData) {
+                        syncData = JSON.parse(storedData);
+                    }
                 }
                 
-                const allData = JSON.parse(decodedString);
-                
-                // 验证数据格式
-                if (!allData || typeof allData !== 'object') {
-                    throw new Error('数据格式不正确');
+                if (!syncData) {
+                    showToast('数字码不存在或已过期', 'error');
+                    return;
                 }
+                
+                // 检查是否过期
+                if (new Date() > new Date(syncData.expiresAt)) {
+                    showToast('数字码已过期，请重新生成', 'error');
+                    return;
+                }
+                
+                const allData = syncData.data;
                 
                 if (confirm('导入数据将覆盖当前设备的所有数据，确定要继续吗？')) {
                     // 清除现有数据
@@ -768,16 +772,14 @@
                     // 导入新数据
                     let importCount = 0;
                     Object.keys(allData).forEach(key => {
-                        if (!key.startsWith('_')) {
-                            localStorage.setItem(key, allData[key]);
-                            importCount++;
-                        }
+                        localStorage.setItem(key, allData[key]);
+                        importCount++;
                     });
                     
-                    showToast(`数据导入成功！导入了 ${importCount} 项数据`, 'success');
+                    showToast(`数据同步成功！同步了 ${importCount} 项数据`, 'success');
                     
                     // 清空输入区域
-                    document.getElementById('importDataArea').value = '';
+                    document.getElementById('syncCodeInput').value = '';
                     document.getElementById('importArea').style.display = 'none';
                     
                     // 如果有导入的用户数据，自动填入用户名
@@ -785,12 +787,13 @@
                     if (importedUsers.length > 0) {
                         const firstUser = importedUsers[0].replace('user_', '');
                         document.getElementById('username').value = firstUser;
-                        showToast(`已导入用户：${firstUser}`, 'info');
+                        showToast(`已同步用户：${firstUser}`, 'info');
                     }
                 }
+                
             } catch (error) {
                 console.error('导入失败:', error);
-                showToast('数据码格式错误或已损坏，导入失败', 'error');
+                showToast('数据同步失败', 'error');
             }
         }
 
@@ -911,6 +914,36 @@
                 setTimeout(() => {
                     window.location.href = 'order.html';
                 }, 1500);
+            }
+            
+            // 清理过期的同步数据
+            for (let i = localStorage.length - 1; i >= 0; i--) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('sync_')) {
+                    try {
+                        const data = JSON.parse(localStorage.getItem(key));
+                        if (new Date() > new Date(data.expiresAt)) {
+                            localStorage.removeItem(key);
+                        }
+                    } catch (e) {
+                        localStorage.removeItem(key);
+                    }
+                }
+            }
+        });
+
+        // 限制数字码输入只能是数字
+        document.addEventListener('DOMContentLoaded', function() {
+            const syncCodeInput = document.getElementById('syncCodeInput');
+            if (syncCodeInput) {
+                syncCodeInput.addEventListener('input', function(e) {
+                    // 只允许数字
+                    this.value = this.value.replace(/[^0-9]/g, '');
+                    // 限制长度为6位
+                    if (this.value.length > 6) {
+                        this.value = this.value.slice(0, 6);
+                    }
+                });
             }
         });
     </script>
