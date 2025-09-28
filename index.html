@@ -504,6 +504,7 @@
         <button class="btn btn-print" onclick="printForm()">🖨️ 打印表单</button>
         <button class="btn btn-export" onclick="exportToPDF()">📄 导出PDF</button>
         <button class="btn btn-image" onclick="exportToImage()">🖼️ 导出图片</button>
+        <button class="btn btn-save" onclick="viewHistory()">📋 历史记录</button>
     </div>
 
     <div class="header">
@@ -617,7 +618,7 @@
                             <input type="text" class="input-field" placeholder="大写金额" id="totalAmountChinese">
                         </div>
                         <div class="amount-number">
-                            小写(¥) <input type="number" class="input-field" style="width: 60%;" step="0.01" id="totalAmountNumber" onchange="updateChinese(this)">
+                            小写(¥) <input type="number" class="input-field" style="width: 60%;" step="0.01" id="totalAmountNumber" onchange="updateChinese(this); calculateBalance();" onblur="formatDecimal(this)">
                         </div>
                     </div>
                 </td>
@@ -630,7 +631,7 @@
                             <input type="text" class="input-field" placeholder="大写金额" id="currentPaymentChinese">
                         </div>
                         <div class="amount-number">
-                            小写(¥) <input type="number" class="input-field" style="width: 60%;" step="0.01" id="currentPaymentNumber" onchange="updateChinese(this); calculateBalance();">
+                            小写(¥) <input type="number" class="input-field" style="width: 60%;" step="0.01" id="currentPaymentNumber" onchange="updateChinese(this); calculateBalance();" onblur="formatDecimal(this)">
                         </div>
                     </div>
                 </td>
@@ -868,6 +869,14 @@
             calculateBalance();
         }
 
+        // 格式化小数点显示
+        function formatDecimal(input) {
+            if (input.value !== '') {
+                const value = parseFloat(input.value) || 0;
+                input.value = value.toFixed(2);
+            }
+        }
+
         // 更新中文大写
         function updateChinese(input) {
             const value = parseFloat(input.value) || 0;
@@ -880,14 +889,28 @@
             }
         }
 
-        // 计算余额
+        // 计算余额 - 修复自动计算
         function calculateBalance() {
-            const total = parseFloat(document.getElementById('totalAmountNumber').value) || 0;
-            const payment = parseFloat(document.getElementById('currentPaymentNumber').value) || 0;
+            const totalInput = document.getElementById('totalAmountNumber');
+            const paymentInput = document.getElementById('currentPaymentNumber');
+            const balanceInput = document.getElementById('balanceNumber');
+            const balanceChineseInput = document.getElementById('balanceChinese');
+            
+            const total = parseFloat(totalInput.value) || 0;
+            const payment = parseFloat(paymentInput.value) || 0;
             const balance = total - payment;
             
-            document.getElementById('balanceNumber').value = balance.toFixed(2);
-            document.getElementById('balanceChinese').value = numberToChinese(balance);
+            // 确保显示两位小数
+            balanceInput.value = balance.toFixed(2);
+            balanceChineseInput.value = numberToChinese(balance);
+            
+            // 如果余额为负数，显示提示
+            if (balance < 0) {
+                balanceInput.style.color = 'red';
+                showToast('付款金额超过实售金额', 'error');
+            } else {
+                balanceInput.style.color = 'inherit';
+            }
         }
 
         // 按钮功能
@@ -900,12 +923,55 @@
                     }
                 });
                 
+                // 添加保存时间戳和订单号
+                data.saveTime = new Date().toLocaleString('zh-CN');
+                data.orderNumber = document.getElementById('orderNumber').value;
+                
+                // 保存到当前数据
                 localStorage.setItem('purchaseOrderData', JSON.stringify(data));
+                
+                // 保存到历史记录
+                saveToHistory(data);
+                
                 showToast('订单保存成功！', 'success');
             } catch (error) {
                 console.error('保存失败:', error);
                 showToast('保存失败，请重试', 'error');
             }
+        }
+
+        // 保存到历史记录
+        function saveToHistory(data) {
+            try {
+                let history = JSON.parse(localStorage.getItem('orderHistory') || '[]');
+                
+                // 检查是否已存在相同订单号的记录
+                const existingIndex = history.findIndex(item => item.orderNumber === data.orderNumber);
+                
+                if (existingIndex >= 0) {
+                    // 更新现有记录
+                    history[existingIndex] = data;
+                    showToast('订单已更新到历史记录', 'info');
+                } else {
+                    // 添加新记录
+                    history.unshift(data); // 添加到数组开头
+                    showToast('订单已添加到历史记录', 'info');
+                }
+                
+                // 限制历史记录数量（最多保存100条）
+                if (history.length > 100) {
+                    history = history.slice(0, 100);
+                }
+                
+                localStorage.setItem('orderHistory', JSON.stringify(history));
+            } catch (error) {
+                console.error('保存历史记录失败:', error);
+            }
+        }
+
+        // 查看历史记录
+        function viewHistory() {
+            window.open('history.html', '_blank');
         }
 
         function createNewOrder() {
