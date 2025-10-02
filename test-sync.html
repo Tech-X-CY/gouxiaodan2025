@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>同步功能测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        .warning { background: #fff3cd; color: #856404; }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+        }
+        button:hover { background: #0056b3; }
+        .data-display {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        input[type="text"] {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 200px;
+        }
+        .step {
+            border-left: 4px solid #007bff;
+            padding-left: 15px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h2>🔄 同步功能测试工具</h2>
+        
+        <div class="test-result info">
+            <strong>测试说明：</strong>这个页面用于测试和调试跨设备同步功能
+        </div>
+        
+        <div class="step">
+            <h3>步骤1：设置 GitHub API Token</h3>
+            <input type="text" id="apiToken" placeholder="输入GitHub API Token">
+            <button onclick="setApiToken()">💾 保存Token</button>
+            <button onclick="clearApiToken()">🗑️ 清除Token</button>
+        </div>
+        
+        <div class="step">
+            <h3>步骤2：生成同步码</h3>
+            <button onclick="generateTestSyncCode()">🎲 生成测试同步码</button>
+            <button onclick="saveTestData()">💾 保存测试数据到云端</button>
+            <div id="syncCodeDisplay" class="data-display" style="display:none;"></div>
+        </div>
+        
+        <div class="step">
+            <h3>步骤3：测试同步</h3>
+            <input type="text" id="testSyncCode" placeholder="输入6位同步码" maxlength="6">
+            <button onclick="testSyncFromCode()">📥 测试同步</button>
+        </div>
+        
+        <div class="step">
+            <h3>步骤4：调试信息</h3>
+            <button onclick="showDebugInfo()">🔍 显示调试信息</button>
+            <button onclick="clearLogs()">🧹 清除日志</button>
+        </div>
+        
+        <div id="results"></div>
+        
+        <div class="test-container">
+            <h3>📋 调试信息</h3>
+            <div id="debugInfo" class="data-display">点击"显示调试信息"查看</div>
+        </div>
+        
+        <div class="test-container">
+            <h3>🔗 快速链接</h3>
+            <a href="index-enhanced.html" target="_blank">🏠 主页面</a> |
+            <a href="https://github.com/settings/tokens" target="_blank">🔑 GitHub Token设置</a>
+        </div>
+    </div>
+
+    <script>
+        let testApiToken = '';
+        let testSyncCode = '';
+        let testGistId = '';
+
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong> - ${message}`;
+            results.appendChild(div);
+            results.scrollTop = results.scrollHeight;
+        }
+
+        function setApiToken() {
+            const token = document.getElementById('apiToken').value.trim();
+            if (!token) {
+                addResult('请输入有效的GitHub API Token', 'error');
+                return;
+            }
+            
+            testApiToken = token;
+            localStorage.setItem('github_api_token', token);
+            addResult('GitHub API Token已保存', 'success');
+        }
+
+        function clearApiToken() {
+            testApiToken = '';
+            localStorage.removeItem('github_api_token');
+            document.getElementById('apiToken').value = '';
+            addResult('GitHub API Token已清除', 'info');
+        }
+
+        function generateTestSyncCode() {
+            testSyncCode = Math.floor(100000 + Math.random() * 900000).toString();
+            document.getElementById('syncCodeDisplay').style.display = 'block';
+            document.getElementById('syncCodeDisplay').textContent = `生成的测试同步码: ${testSyncCode}`;
+            document.getElementById('testSyncCode').value = testSyncCode;
+            addResult(`生成测试同步码: ${testSyncCode}`, 'success');
+        }
+
+        async function saveTestData() {
+            if (!testApiToken) {
+                addResult('请先设置GitHub API Token', 'error');
+                return;
+            }
+            
+            if (!testSyncCode) {
+                addResult('请先生成同步码', 'error');
+                return;
+            }
+
+            try {
+                addResult('正在保存测试数据到云端...', 'info');
+                
+                const testData = {
+                    code: testSyncCode,
+                    deviceId: 'test_device_' + Date.now(),
+                    timestamp: Date.now(),
+                    data: {
+                        orderNumber: 'TEST' + Date.now(),
+                        documentType: '预算',
+                        buyer: '测试买方',
+                        seller: '测试卖方',
+                        products: [
+                            {
+                                name: '测试产品',
+                                model: '测试型号',
+                                specs: '测试规格',
+                                price: '100',
+                                quantity: '1',
+                                unit: '个',
+                                total: '100'
+                            }
+                        ],
+                        totalAmount: '100',
+                        paymentAmount: '50',
+                        balance: '50'
+                    }
+                };
+
+                const result = await saveToGist(`sync_${testSyncCode}`, testData);
+                testGistId = result.id;
+                
+                addResult(`测试数据保存成功！Gist ID: ${testGistId}`, 'success');
+                addResult(`同步码: ${testSyncCode}`, 'info');
+                
+            } catch (error) {
+                addResult(`保存失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function testSyncFromCode() {
+            const code = document.getElementById('testSyncCode').value.trim();
+            if (!code || code.length !== 6) {
+                addResult('请输入有效的6位同步码', 'error');
+                return;
+            }
+            
+            if (!testApiToken) {
+                addResult('请先设置GitHub API Token', 'error');
+                return;
+            }
+
+            try {
+                addResult(`正在测试同步码: ${code}`, 'info');
+                
+                const syncData = await loadSyncDataByCode(code);
+                if (syncData && syncData.data) {
+                    addResult('✅ 同步测试成功！', 'success');
+                    addResult(`同步的数据: ${JSON.stringify(syncData.data, null, 2)}`, 'info');
+                } else {
+                    addResult('❌ 未找到对应的同步数据', 'error');
+                }
+                
+            } catch (error) {
+                addResult(`❌ 同步测试失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function saveToGist(filename, data) {
+            const gistData = {
+                description: "购销单系统数据同步测试",
+                public: false,
+                files: {
+                    [filename + '.json']: {
+                        content: JSON.stringify(data, null, 2)
+                    }
+                }
+            };
+
+            const response = await fetch('https://api.github.com/gists', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `token ${testApiToken}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(gistData)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`GitHub API错误 ${response.status}: ${errorData.message || '未知错误'}`);
+            }
+
+            return await response.json();
+        }
+
+        async function loadFromGist(gistId, filename) {
+            const response = await fetch(`https://api.github.com/gists/${gistId}`, {
+                headers: {
+                    'Authorization': `token ${testApiToken}`,
+                }
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`GitHub API错误 ${response.status}: ${errorData.message || '未知错误'}`);
+            }
+
+            const gist = await response.json();
+            const file = gist.files[filename + '.json'];
+            
+            if (!file) {
+                throw new Error(`文件 ${filename}.json 不存在`);
+            }
+
+            return JSON.parse(file.content);
+        }
+
+        async function loadSyncDataByCode(code) {
+            try {
+                // 如果有测试的 gistId，直接从那里读取
+                if (testGistId) {
+                    return await loadFromGist(testGistId, `sync_${code}`);
+                }
+                
+                // 否则尝试搜索公共 gists（这在实际中可能需要不同的实现）
+                throw new Error('无法找到对应的同步数据，请确认同步码是否正确');
+                
+            } catch (error) {
+                throw new Error('无法找到同步数据: ' + error.message);
+            }
+        }
+
+        function showDebugInfo() {
+            const debugInfo = {
+                apiToken: testApiToken ? '已设置 (长度: ' + testApiToken.length + ')' : '未设置',
+                testSyncCode: testSyncCode || '未生成',
+                testGistId: testGistId || '未创建',
+                localStorage: {
+                    github_api_token: localStorage.getItem('github_api_token') ? '已保存' : '未保存',
+                    sync_gist_id: localStorage.getItem('sync_gist_id') || '未保存',
+                    last_sync_code: localStorage.getItem('last_sync_code') || '无',
+                    last_sync_time: localStorage.getItem('last_sync_time') ? new Date(parseInt(localStorage.getItem('last_sync_time'))).toLocaleString() : '无'
+                },
+                timestamp: new Date().toLocaleString()
+            };
+            
+            document.getElementById('debugInfo').textContent = JSON.stringify(debugInfo, null, 2);
+            addResult('调试信息已更新', 'info');
+        }
+
+        function clearLogs() {
+            document.getElementById('results').innerHTML = '';
+            addResult('日志已清除', 'info');
+        }
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedToken = localStorage.getItem('github_api_token');
+            if (savedToken) {
+                testApiToken = savedToken;
+                document.getElementById('apiToken').value = savedToken;
+                addResult('已加载保存的GitHub API Token', 'success');
+            }
+            
+            addResult('同步功能测试页面加载完成', 'success');
+            showDebugInfo();
+        });
+    </script>
+</body>
+</html>
